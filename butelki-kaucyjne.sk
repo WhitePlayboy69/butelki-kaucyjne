@@ -1,5 +1,5 @@
 options:
-    version: 1.0
+    version: 1.1
     date: 02.08.2026
 
     bk-name: "&f&lButelka kaucyjna"
@@ -8,17 +8,43 @@ options:
 
     bnk-name: "&fButelka niekaucyjna"
     bnk-lore: "&6Bezużyteczny plastik."
-    # ^^^ nie zmieniaj jesli butelki juz byly wprowadzone na serwerze
 
     first-greeting: "&fZdobywaj &6butelki kaucyjne &fkopiac, atakujac i lowiac!"
 
+    copper-chance: 15%
+    lapis-chance: 15%
+    redstone-chance: 20%
+    coal-chance: 20%
+    iron-chance: 30%
+    gold-chance: 35%
+    emerald-chance: 60%
+    diamond-chance: 65%
+    netherite-chance: 70%
+
+    spider-chance: 25%
+    zombie-chance: 30%
+    skeleton-chance: 35%
+    creeper-chance: 50%
+
+    fishing-chance: 75%
+    fishing-min: 3
+    fishing-max: 8
+
+    kaucyjna-chance: 90% 
+    kaucyjna-money-per: 0.50
+
+    allowed-mobs: "zombie", "skeleton", "creeper" and "spider"
+
 command /kaucja-info:
-    permission: butelki.info
     trigger:
         send "&f=== &aBUTELKI KAUCYJNE &f===" to player
         send "&fWersja: &6{@version} ({@date})" to player
         send "&fGithub: &6https://github.com/WhitePlayboy69/butelki-kaucyjne/" to player
         send "&f=======================" to player
+
+on load:
+  # parsowanie tych z allowed mobs xd
+  set {allowed_mobs::*} to {@allowed-mobs} split at ", "
 
 on join:
   send "&fWitaj &6%player% &fna serwerze!" to player
@@ -30,49 +56,63 @@ on mine:
   set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
   
   if event-block is coal ore or deepslate coal ore:
-    if chance of 20%:
+    if chance of {@coal-chance}:
       send "&fTen &8węgiel &fmiał w sobie butelki kaucyjne!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fNiestety, ten &8węgiel &fnie miał w sobie butelki kaucyjnej :(" to player
 
   else if event-block is copper ore or deepslate copper ore:
-    if chance of 15%:
+    if chance of {@copper-chance}:
       send "&fTa &3miedź &fmiała w sobie butelkę kaucyjną!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fNiestety, ta &3miedź &fnie miała w sobie butelki kaucyjnej." to player
 
   else if event-block is iron ore or deepslate iron ore:
-    if chance of 30%:
+    if chance of {@iron-chance}:
       send "&fTo &7żelażo &fmiało w sobie butelkę kaucyjną!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fTo &7żelażo &fnie miało w sobie butelki kaucyjnej!" to player
 
+  else if event-block is redstone ore or deepslate redstone ore:
+    if chance of {@redstone-chance}:
+      send "&fTen &credstone &fmiał w sobie butelkę kaucyjną!" to player
+      drop 1 of {_kaucyjna} at event-block
+    else:
+      send "&fTen &credstone &fnie miał w sobie butelki kaucyjnej!" to player
+
+  else if event-block is lapis ore or deepslate lapis ore:
+    if chance of {@lapis-chance}:
+      send "&fTen &9lapis lazuli &fmiał w sobie butelkę kaucyjną!" to player
+      drop 1 of {_kaucyjna} at event-block
+    else:
+      send "&fTen &9lapis lazuli &fnie miał w sobie butelki kaucyjnej :(" to player    
+
   else if event-block is gold ore or deepslate gold ore:
-    if chance of 35%:
+    if chance of {@gold-chance}:
       send "&fTo &6złoto &fmiało w sobie butelkę kaucyjną! :)" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fTo &6złoto &fnie miało w sobie butelki kaucyjnej!" to player
 
   else if event-block is emerald ore or deepslate emerald ore:
-    if chance of 60%:
+    if chance of {@emerald-chance}:
       send "&fTen &aemerald &fmiał w sobie butelkę kaucyjną!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fTen &aemerald &fnie miał w sobie butelki kaucyjnej." to player
 
   else if event-block is diamond ore or deepslate diamond ore:
-    if chance of 65%:
+    if chance of {@diamond-chance}:
       send "&fTen &bdiament &fmiał w sobie butelkę kaucyjną!!!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
       send "&fTen &bdiament &fnie miał w sobie butelki kaucyjnej!" to player
 
   else if event-block is ancient debris:
-    if chance of 70%:
+    if chance of {@netherite-chance}:
       send "&fTen &8netheryt &fmiał w sobie butelkę kaucyjną!" to player
       drop 1 of {_kaucyjna} at event-block
     else:
@@ -85,48 +125,63 @@ on death:
   if victim is not player:
     if attacker is player:
       if victim is a zombie:
-        if chance of 30%:
-          if chance of 90%:
-            send "&fTen &2zombie &fmiał przy sobie butelkę kaucyjną!" to attacker
-            drop 1 of {_kaucyjna} at victim
+        if {allowed_mobs::*} contains "zombie":
+          if chance of {@zombie-chance}:
+            if chance of {@kaucyjna-chance}:
+              send "&fTen &2zombie &fmiał przy sobie butelkę kaucyjną!" to attacker
+              drop 1 of {_kaucyjna} at victim
+            else:
+              send "&fTen &2zombie &fmiał butelkę ale &6niekaucyjną&f!! :(" to attacker
+              drop 1 of {_niekaucyjna} at victim
           else:
-            send "&fTen &2zombie &fmiał butelkę ale &6niekaucyjną&f!! :(" to attacker
-            drop 1 of {_niekaucyjna} at victim
-        else:
-          send "&fTen &2zombie &fnie miał przy sobie butelki kaucyjnej." to attacker
-     
+            send "&fTen &2zombie &fnie miał przy sobie butelki kaucyjnej." to attacker
+      
       else if victim is a skeleton:
-        if chance of 35%:
-          if chance of 90%:
-            send "&fTen &7szkielet &fmiał przy sobie butelkę kaucyjną!" to attacker
-            drop 1 of {_kaucyjna} at victim
+        if {allowed_mobs::*} contains "skeleton":
+          if chance of {@skeleton-chance}:
+            if chance of {@kaucyjna-chance}:
+              send "&fTen &7szkielet &fmiał przy sobie butelkę kaucyjną!" to attacker
+              drop 1 of {_kaucyjna} at victim
+            else:
+              send "&fTen &7szkielet &fmiał przy sobie butelkę &6niekaucyjną&f!" to attacker
+              drop 1 of {_niekaucyjna} at victim
           else:
-            send "&fTen &7szkielet &fmiał przy sobie butelkę &6niekaucyjną&f!" to attacker
-            drop 1 of {_niekaucyjna} at victim
-        else:
-          send "&fTen &7szkielet &fnie miał przy sobie butelki kaucyjnej!" to attacker
+            send "&fTen &7szkielet &fnie miał przy sobie butelki kaucyjnej!" to attacker
 
       else if victim is a creeper:
-        if chance of 50%:
-          if chance of 90%:
-            send "&fTen &acreeper &fmiał przy sobię butelkę kaucyjną!" to attacker
-            drop 1 of {_kaucyjna} at victim
+        if {allowed_mobs::*} contains "creeper": 
+          if chance of {@creeper-chance}:
+            if chance of {@kaucyjna-chance}:
+              send "&fTen &acreeper &fmiał przy sobię butelkę kaucyjną!" to attacker
+              drop 1 of {_kaucyjna} at victim
+            else:
+              send "&fTen &acreeper &fmiał przy sobie butelkę &6niekaucyjną&f! :(" to attacker
+              drop 1 of {_niekaucyjna} at victim
           else:
-            send "&fTen &acreeper &fmiał przy sobie butelkę &6niekaucyjną&f! :(" to attacker
-            drop 1 of {_niekaucyjna} at victim
-        else:
-          send "&fTen &acreeper &fnie miał przy sobie butelki kaucyjnej! :(" to attacker
+            send "&fTen &acreeper &fnie miał przy sobie butelki kaucyjnej! :(" to attacker
     
       else if victim is a spider:
-        if chance of 25%:
-          if chance of 90%:
-            send "&fTen &7pająk &fmiał przy sobie butelkę kaucyjną!" to attacker
-            drop 1 of {_kaucyjna} at victim
+        if {allowed_mobs::*} contains "spider":
+          if chance of {@spider-chance}:
+            if chance of {@kaucyjna-chance}:
+              send "&fTen &7pająk &fmiał przy sobie butelkę kaucyjną!" to attacker
+              drop 1 of {_kaucyjna} at victim
+            else:
+              send "&fTen &7pająk &fmiał przy sobie butelkę &6niekaucyjną&f! :(" to attacker
+              drop 1 of {_niekaucyjna} at victim
           else:
-            send "&fTen &7pająk &fmiał przy sobie butelkę &6niekaucyjną&f! :(" to attacker
-            drop 1 of {_niekaucyjna} at victim
-        else:
-          send "&fTen &7pająk &fnie miał przy sobie butelki kaucyjnej! :(" to attacker  
+            send "&fTen &7pająk &fnie miał przy sobie butelki kaucyjnej! :(" to attacker  
+
+on fishing state change:
+  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
+
+  if event-fishing state is fish caught:
+    if chance of {@fishing-chance}:
+      set {_ile} to a random integer between {@fishing-min} and {@fishing-max}
+      send "&fWyłowiłeś &6%{_ile}% &fbutelek kaucyjnych!" to player
+      drop {_ile} of {_kaucyjna} at player
+    else:
+      send "&fNie wyłowiłeś butelki kaucyjnej! :(" to player
 
 on rightclick:
   set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
@@ -137,7 +192,7 @@ on rightclick:
       if name of player's held item is {@bk-name}:
         if line 1 of lore of player's held item is {@bk-lore1}:
           set {_ilosc} to item amount of player's held item
-          set {_piniadz} to {_ilosc} * 0.50
+          set {_piniadz} to {_ilosc} * {@kaucyjna-money-per}
             
           set player's held item to air
           add {_piniadz} to player's money
@@ -146,14 +201,3 @@ on rightclick:
       else if name of player's held item is "&fButelka niekaucyjna":
         if line 1 of lore of player's held item is "&6Bezużyteczny plastik.":
           send "&cTo nie jest butelka kaucyjna! (to jest niekaucyjna)" to player
-
-on fishing state change:
-  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
-
-  if event-fishing state is fish caught:
-    if chance of 75%:
-      set {_ile} to a random integer between 3 and 8
-      send "&fWyłowiłeś &6%{_ile}% &fbutelek kaucyjnych!" to player
-      drop {_ile} of {_kaucyjna} at player
-    else:
-      send "&fNie wyłowiłeś butelki kaucyjnej! :(" to player
