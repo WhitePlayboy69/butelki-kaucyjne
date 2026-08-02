@@ -1,13 +1,33 @@
+options:
+    version: 1.0
+    date: 02.08.2026
+
+    bk-name: "&f&lButelka kaucyjna"
+    bk-lore1: "&6Butelka, którą można zamienić w butelkomacie."
+    bk-lore2: "&fKliknij &8Shift + PPM &ftrzymając butelkę, by ją wymienić."
+
+    bnk-name: "&fButelka niekaucyjna"
+    bnk-lore: "&6Bezużyteczny plastik."
+    # ^^^ nie zmieniaj jesli butelki juz byly wprowadzone na serwerze
+
+    first-greeting: "&fZdobywaj &6butelki kaucyjne &fkopiac, atakujac i lowiac!"
+
+command /kaucja-info:
+    permission: butelki.info
+    trigger:
+        send "&f=== &aBUTELKI KAUCYJNE &f===" to player
+        send "&fWersja: &6{@version} ({@date})" to player
+        send "&fGithub: &6https://github.com/WhitePlayboy69/butelki-kaucyjne/" to player
+        send "&f=======================" to player
+
 on join:
   send "&fWitaj &6%player% &fna serwerze!" to player
   if {first_join::%player's uuid%} is not set:
     set {first_join::%player's uuid%} to false
-    send "&fZdobywaj &6butelki kaucyjne &fkopiac, atakujac i lowiac!" to player
+    send {@first-greeting} to player
 
-on mine:  
-  set {_lore1} to "&6Butelka, którą można zamienić w butelkomacie."
-  set {_lore2} to "&fKliknij &8Shift + PPM &ftrzymając butelkę, by ją wymienić."
-  set {_kaucyjna} to glass bottle named "&f&lButelka kaucyjna" with lore {_lore1} and {_lore2}
+on mine:
+  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
   
   if event-block is coal ore or deepslate coal ore:
     if chance of 20%:
@@ -59,11 +79,8 @@ on mine:
       send "&fTen &8netheryt &fnie miał w sobie butelki kaucyjnej." to player
 
 on death:
-  set {_lore1} to "&6Butelka, którą można zamienić w butelkomacie."
-  set {_lore2} to "&fKliknij &8Shift + PPM &ftrzymając butelkę, by ją wymienić."
-  set {_kaucyjna} to glass bottle named "&f&lButelka kaucyjna" with lore {_lore1} and {_lore2}
-  set {_niekaucyjna} to glass bottle named "&fButelka niekaucyjna" with lore "&6Bezużyteczny plastik."
-  # ^^^ musze bo nie wiem jak robic globalne bez zapisywania na dysku xd
+  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
+  set {_niekaucyjna} to glass bottle named {@bnk-name} with lore {@bnk-lore}
 
   if victim is not player:
     if attacker is player:
@@ -99,17 +116,26 @@ on death:
             drop 1 of {_niekaucyjna} at victim
         else:
           send "&fTen &acreeper &fnie miał przy sobie butelki kaucyjnej! :(" to attacker
+    
+      else if victim is a spider:
+        if chance of 25%:
+          if chance of 90%:
+            send "&fTen &7pająk &fmiał przy sobie butelkę kaucyjną!" to attacker
+            drop 1 of {_kaucyjna} at victim
+          else:
+            send "&fTen &7pająk &fmiał przy sobie butelkę &6niekaucyjną&f! :(" to attacker
+            drop 1 of {_niekaucyjna} at victim
+        else:
+          send "&fTen &7pająk &fnie miał przy sobie butelki kaucyjnej! :(" to attacker  
 
 on rightclick:
-  set {_lore1} to "&6Butelka, którą można zamienić w butelkomacie."
-  set {_lore2} to "&fKliknij &8Shift + PPM &ftrzymając butelkę, by ją wymienić."
-  set {_kaucyjna} to glass bottle named "&f&lButelka kaucyjna" with lore {_lore1} and {_lore2}
-  set {_niekaucyjna} to glass bottle named "&fButelka niekaucyjna" with lore "&6Bezużyteczny plastik."
+  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
+  set {_niekaucyjna} to glass bottle named {@bnk-name} with lore {@bnk-lore}
 
   if player is sneaking:
     if player's held item is glass bottle:
-      if name of player's held item is "&f&lButelka kaucyjna":
-        if line 1 of lore of player's held item is {_lore1}:
+      if name of player's held item is {@bk-name}:
+        if line 1 of lore of player's held item is {@bk-lore1}:
           set {_ilosc} to item amount of player's held item
           set {_piniadz} to {_ilosc} * 0.50
             
@@ -122,9 +148,7 @@ on rightclick:
           send "&cTo nie jest butelka kaucyjna! (to jest niekaucyjna)" to player
 
 on fishing state change:
-  set {_lore1} to "&6Butelka, którą można zamienić w butelkomacie."
-  set {_lore2} to "&fKliknij &8Shift + PPM &ftrzymając butelkę, by ją wymienić."
-  set {_kaucyjna} to glass bottle named "&f&lButelka kaucyjna" with lore {_lore1} and {_lore2}
+  set {_kaucyjna} to glass bottle named {@bk-name} with lore {@bk-lore1} and {@bk-lore2}
 
   if event-fishing state is fish caught:
     if chance of 75%:
